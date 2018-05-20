@@ -15,7 +15,6 @@ public class DefaultParser implements DataParser {
 
 	@Override
 	public List<ListEntry> parseData(JsonNode node) {
-
 		List<ListEntry> entries = new ArrayList<>();
 		log.info("Parsing json data");
 		try {
