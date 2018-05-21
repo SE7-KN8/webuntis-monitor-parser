@@ -33,7 +33,7 @@ public class SQLReceiver implements DataReceiver {
 			Statement createTableStatement = connection.createStatement();
 			createTableStatement.execute("CREATE TABLE `" + handler.getProperties().getProperty(ConfigHandler.Constants.SQL.SQL_SCHEMA) + "`.`student_substitute` (\n" +
 					"  `id` INT AUTO_INCREMENT,\n" +
-					"  `date` INT,\n" +
+					"  `date` TEXT,\n" +
 					"  `className` TEXT,\n" +
 					"  `hour` TEXT,\n" +
 					"  `classes` TEXT,\n" +

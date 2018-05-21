@@ -5,13 +5,18 @@ import com.mashape.unirest.http.JsonNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public class DefaultParser implements DataParser {
 
 	private static final Logger log = Logger.getLogger(DefaultParser.class.getName());
+
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.GERMAN);
+	private static final SimpleDateFormat endFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
 
 	@Override
 	public List<ListEntry> parseData(JsonNode node) {
@@ -20,7 +25,7 @@ public class DefaultParser implements DataParser {
 		try {
 			JSONObject root = node.getObject().getJSONObject("payload");
 			JSONArray rows = root.getJSONArray("rows");
-			int date = root.getInt("date");
+			String date = String.valueOf(root.getInt("date"));
 			for (Object element : rows) {
 				if (element instanceof JSONObject) {
 					JSONObject classEntry = (JSONObject) element;
@@ -34,7 +39,7 @@ public class DefaultParser implements DataParser {
 					String infoText = dataArray.getString(5);
 					String text = dataArray.getString(6);
 
-					entries.add(new ListEntry(className, hour, classes, subject, room, teacher, text, infoText, date));
+					entries.add(new ListEntry(className, hour, classes, subject, room, teacher, text, infoText, endFormat.format((format.parse(date)))));
 				}
 			}
 			log.info("Successfully parsed json data");

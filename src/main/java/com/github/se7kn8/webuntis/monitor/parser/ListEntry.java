@@ -10,9 +10,9 @@ public class ListEntry {
 	private final String teacher;
 	private final String infoText;
 	private final String text;
-	private final int date;
+	private final String date;
 
-	public ListEntry(String className, String hours, String classes, String subject, String room, String teacher, String text, String infoText, int date) {
+	public ListEntry(String className, String hours, String classes, String subject, String room, String teacher, String text, String infoText, String date) {
 		this.className = className;
 		this.hours = hours;
 		this.classes = classes;
@@ -24,7 +24,7 @@ public class ListEntry {
 		this.date = date;
 	}
 
-	public int getDate() {
+	public String getDate() {
 		return date;
 	}
 
