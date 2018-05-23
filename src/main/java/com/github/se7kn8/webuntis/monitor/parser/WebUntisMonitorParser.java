@@ -1,6 +1,8 @@
 package com.github.se7kn8.webuntis.monitor.parser;
 
-import com.github.se7kn8.webuntis.monitor.parser.parser.DefaultParser;
+import com.github.se7kn8.webuntis.monitor.parser.entry.ListEntry;
+import com.github.se7kn8.webuntis.monitor.parser.parser.NewsParser;
+import com.github.se7kn8.webuntis.monitor.parser.parser.SubstituteParser;
 import com.github.se7kn8.webuntis.monitor.parser.receiver.DataReceiver;
 import com.github.se7kn8.webuntis.monitor.parser.receiver.FileReceiver;
 import com.github.se7kn8.webuntis.monitor.parser.receiver.SQLReceiver;
@@ -16,10 +18,10 @@ import java.util.logging.Logger;
 
 public class WebUntisMonitorParser {
 
-	static{
-		try{
+	static {
+		try {
 			LogManager.getLogManager().readConfiguration(ClassLoader.getSystemResourceAsStream("logging.properties"));
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -33,15 +35,15 @@ public class WebUntisMonitorParser {
 				ConfigHandler handler = new ConfigHandler(configPath);
 				handler.saveConfig();
 
-				List<ListEntry> rootList = new ArrayList<>();
+				List<ListEntry> substituteList = new ArrayList<>();
+				List<ListEntry> newsList = new ArrayList<>();
 				for (int i = 0; i < Integer.valueOf(handler.getProperties().getProperty(ConfigHandler.Constants.DAYS_TO_LOAD)); i++) {
 					JsonNode node = new HTTPClient(handler).receiveData(i);
-					List<ListEntry> entries = new DefaultParser().parseData(node);
+					List<ListEntry> substituteEntries = new SubstituteParser().parseData(node);
+					List<ListEntry> newsEntries = new NewsParser().parseData(node);
 
-					List<ListEntry> newList = new ArrayList<>();
-					newList.addAll(rootList);
-					newList.addAll(entries);
-					rootList = newList;
+					substituteList = Util.appendToList(substituteEntries, substituteList);
+					newsList = Util.appendToList(newsEntries, newsList);
 				}
 
 				DataReceiver receiver;
@@ -63,7 +65,8 @@ public class WebUntisMonitorParser {
 					throw new IllegalStateException("There was an error while opening the data receiver", e);
 				}
 				try {
-					receiver.exportData(rootList);
+					receiver.exportData(substituteList, ParseType.SUBSTITUTE);
+					receiver.exportData(newsList, ParseType.NEWS);
 				} catch (Exception e) {
 					throw new IllegalStateException("There was an error while exporting the data", e);
 				}

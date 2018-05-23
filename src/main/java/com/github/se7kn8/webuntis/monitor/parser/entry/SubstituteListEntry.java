@@ -1,7 +1,6 @@
-package com.github.se7kn8.webuntis.monitor.parser;
+package com.github.se7kn8.webuntis.monitor.parser.entry;
 
-public class ListEntry {
-
+public class SubstituteListEntry implements ListEntry {
 	private final String className;
 	private final String hours;
 	private final String classes;
@@ -12,7 +11,7 @@ public class ListEntry {
 	private final String text;
 	private final String date;
 
-	public ListEntry(String className, String hours, String classes, String subject, String room, String teacher, String text, String infoText, String date) {
+	public SubstituteListEntry(String className, String hours, String classes, String subject, String room, String teacher, String text, String infoText, String date) {
 		this.className = className;
 		this.hours = hours;
 		this.classes = classes;

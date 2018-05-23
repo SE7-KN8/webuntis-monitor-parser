@@ -1,7 +1,10 @@
 package com.github.se7kn8.webuntis.monitor.parser.receiver;
 
 import com.github.se7kn8.webuntis.monitor.parser.ConfigHandler;
-import com.github.se7kn8.webuntis.monitor.parser.ListEntry;
+import com.github.se7kn8.webuntis.monitor.parser.ParseType;
+import com.github.se7kn8.webuntis.monitor.parser.entry.ListEntry;
+import com.github.se7kn8.webuntis.monitor.parser.entry.NewsEntry;
+import com.github.se7kn8.webuntis.monitor.parser.entry.SubstituteListEntry;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -45,40 +48,81 @@ public class SQLReceiver implements DataReceiver {
 					"  PRIMARY KEY (`id`));");
 			log.info("Table created!");
 		}
+
+		ResultSet newsSet = checkTableStatement.executeQuery("show tables like 'student_news';");
+		if (!(newsSet.first() && newsSet.getString(1).equals("student_news"))) {
+			Statement createTableStatement = connection.createStatement();
+			createTableStatement.execute("CREATE TABLE `" + handler.getProperties().getProperty(ConfigHandler.Constants.SQL.SQL_SCHEMA) + "`.`student_news` (\n" +
+					"  `id` INT AUTO_INCREMENT,\n" +
+					"  `date` TEXT,\n" +
+					"  `subject` TEXT,\n" +
+					"  `body` TEXT,\n" +
+					"  PRIMARY KEY (`id`));");
+			log.info("Table created!");
+		}
+
 	}
 
 	@Override
-	public void exportData(List<ListEntry> entries) throws Exception {
+	public void exportData(List<ListEntry> entries, ParseType type) throws Exception {
 
-		Statement updateDataStatement = connection.createStatement();
+		if (type == ParseType.SUBSTITUTE) {
+			Statement updateDataStatement = connection.createStatement();
 
-		StringBuilder queries = new StringBuilder();
+			StringBuilder queries = new StringBuilder();
 
-		boolean first = true;
+			boolean first = true;
 
-		for (ListEntry entry : entries) {
-			String query = "('" +
-					entry.getDate() + "', '" +
-					entry.getClassName() + "', '" +
-					entry.getHours() + "', '" +
-					entry.getClasses() + "', '" +
-					entry.getSubject() + "', '" +
-					entry.getRoom() + "', '" +
-					entry.getTeacher() + "', '" +
-					entry.getInfoText() + "', '" +
-					entry.getText() + "')";
-			if (first) {
-				queries.append(query);
-				first = false;
-			} else {
-				queries.append(",");
-				queries.append(query);
+			for (ListEntry entry : entries) {
+				SubstituteListEntry listEntry = (SubstituteListEntry) entry;
+				String query = "('" +
+						listEntry.getDate() + "', '" +
+						listEntry.getClassName() + "', '" +
+						listEntry.getHours() + "', '" +
+						listEntry.getClasses() + "', '" +
+						listEntry.getSubject() + "', '" +
+						listEntry.getRoom() + "', '" +
+						listEntry.getTeacher() + "', '" +
+						listEntry.getInfoText() + "', '" +
+						listEntry.getText() + "')";
+				if (first) {
+					queries.append(query);
+					first = false;
+				} else {
+					queries.append(",");
+					queries.append(query);
+				}
 			}
+			updateDataStatement.execute("truncate student_substitute;");
+			log.info("Old table cleared");
+			updateDataStatement.execute("INSERT INTO `" + handler.getProperties().getProperty(ConfigHandler.Constants.SQL.SQL_SCHEMA) + "`.`student_substitute` (`date`, `className`, `hour`, `classes`, `subject`, `room`, `teacher`, `info_text`, `text`) VALUES " + queries.toString() + ";\n");
+			log.info("New data inserted");
+		} else if (type == ParseType.NEWS) {
+			Statement updateDataStatement = connection.createStatement();
+
+			StringBuilder queries = new StringBuilder();
+
+			boolean first = true;
+
+			for (ListEntry entry : entries) {
+				NewsEntry listEntry = (NewsEntry) entry;
+				String query = "('" +
+						listEntry.getDate() + "', '" +
+						listEntry.getSubject() + "', '" +
+						listEntry.getBody() + "')";
+				if (first) {
+					queries.append(query);
+					first = false;
+				} else {
+					queries.append(",");
+					queries.append(query);
+				}
+			}
+			updateDataStatement.execute("truncate student_news;");
+			log.info("Old table cleared");
+			updateDataStatement.execute("INSERT INTO `" + handler.getProperties().getProperty(ConfigHandler.Constants.SQL.SQL_SCHEMA) + "`.`student_news` (`date`, `subject`, `body`) VALUES " + queries.toString() + ";\n");
+			log.info("New data inserted");
 		}
-		updateDataStatement.execute("truncate student_substitute;");
-		log.info("Old table cleared");
-		updateDataStatement.execute("INSERT INTO `" + handler.getProperties().getProperty(ConfigHandler.Constants.SQL.SQL_SCHEMA) + "`.`student_substitute` (`date`, `className`, `hour`, `classes`, `subject`, `room`, `teacher`, `info_text`, `text`) VALUES " + queries.toString() + ";\n");
-		log.info("New data inserted");
 	}
 
 	@Override

@@ -2,6 +2,11 @@ package com.github.se7kn8.webuntis.monitor.parser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class Util {
 
@@ -20,4 +25,23 @@ public class Util {
 		}
 
 	}
+
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.GERMAN);
+	private static final SimpleDateFormat endFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
+
+	public static String parseWebUntisDate(int date) {
+		try {
+			return endFormat.format((format.parse(String.valueOf(date))));
+		} catch (ParseException e) {
+			throw new IllegalStateException("Can't parse webuntis date", e);
+		}
+	}
+
+	public static <T> List<T> appendToList(List<T> list, List<T> rootList) {
+		List<T> newList = new ArrayList<>();
+		newList.addAll(rootList);
+		newList.addAll(list);
+		return newList;
+	}
+
 }

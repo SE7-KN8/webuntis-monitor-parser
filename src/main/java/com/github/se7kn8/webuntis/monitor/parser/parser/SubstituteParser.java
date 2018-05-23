@@ -1,6 +1,8 @@
 package com.github.se7kn8.webuntis.monitor.parser.parser;
 
-import com.github.se7kn8.webuntis.monitor.parser.ListEntry;
+import com.github.se7kn8.webuntis.monitor.parser.Util;
+import com.github.se7kn8.webuntis.monitor.parser.entry.ListEntry;
+import com.github.se7kn8.webuntis.monitor.parser.entry.SubstituteListEntry;
 import com.mashape.unirest.http.JsonNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,12 +13,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-public class DefaultParser implements DataParser {
+public class SubstituteParser implements DataParser {
 
-	private static final Logger log = Logger.getLogger(DefaultParser.class.getName());
-
-	private static final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.GERMAN);
-	private static final SimpleDateFormat endFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN);
+	private static final Logger log = Logger.getLogger(SubstituteParser.class.getName());
 
 	@Override
 	public List<ListEntry> parseData(JsonNode node) {
@@ -25,7 +24,7 @@ public class DefaultParser implements DataParser {
 		try {
 			JSONObject root = node.getObject().getJSONObject("payload");
 			JSONArray rows = root.getJSONArray("rows");
-			String date = String.valueOf(root.getInt("date"));
+			int date = root.getInt("date");
 			for (Object element : rows) {
 				if (element instanceof JSONObject) {
 					JSONObject classEntry = (JSONObject) element;
@@ -39,7 +38,7 @@ public class DefaultParser implements DataParser {
 					String infoText = dataArray.getString(5);
 					String text = dataArray.getString(6);
 
-					entries.add(new ListEntry(className, hour, classes, subject, room, teacher, text, infoText, endFormat.format((format.parse(date)))));
+					entries.add(new SubstituteListEntry(className, hour, classes, subject, room, teacher, text, infoText, Util.parseWebUntisDate(date)));
 				}
 			}
 			log.info("Successfully parsed json data");
