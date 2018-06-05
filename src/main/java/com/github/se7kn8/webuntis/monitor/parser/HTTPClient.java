@@ -14,12 +14,12 @@ public class HTTPClient {
 		this.handler = handler;
 	}
 
-	public JsonNode receiveData(int index) {
+	public JsonNode receiveData(int index, int initialDate) {
 		try {
 			log.info("Loading data for day with offset " + index);
 			return Unirest.post(handler.getProperties().getProperty(ConfigHandler.Constants.WEBUNTIS_MONITOR_URL))
 					.header("Content-type", "application/json")
-					.body(Util.readResource("post-data/webuntis-post-data.json").replace("\"%1\"", String.valueOf(index)))
+					.body(Util.readResource("post-data/webuntis-post-data.json").replace("\"%1\"", String.valueOf(index)).replace("\"%2\"", String.valueOf(initialDate)))
 					.asJson().getBody();
 		} catch (Exception e) {
 			e.printStackTrace();

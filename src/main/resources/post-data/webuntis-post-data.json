@@ -1,7 +1,7 @@
 {
   "formatName": "Schüler",
   "schoolName": "KGS Sehnde",
-  "date": 20180520,
+  "date": "%2",
   "dateOffset": "%1",
   "strikethrough": true,
   "mergeBlocks": true,

@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +36,10 @@ public class Util {
 		} catch (ParseException e) {
 			throw new IllegalStateException("Can't parse webuntis date", e);
 		}
+	}
+
+	public static int toWebuntisDate(Date now) {
+		return Integer.valueOf(format.format(now));
 	}
 
 	public static <T> List<T> appendToList(List<T> list, List<T> rootList) {

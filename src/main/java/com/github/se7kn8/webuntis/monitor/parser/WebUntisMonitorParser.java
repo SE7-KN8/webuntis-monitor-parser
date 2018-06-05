@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -38,7 +39,7 @@ public class WebUntisMonitorParser {
 				List<ListEntry> substituteList = new ArrayList<>();
 				List<ListEntry> newsList = new ArrayList<>();
 				for (int i = 0; i < Integer.valueOf(handler.getProperties().getProperty(ConfigHandler.Constants.DAYS_TO_LOAD)); i++) {
-					JsonNode node = new HTTPClient(handler).receiveData(i);
+					JsonNode node = new HTTPClient(handler).receiveData(i, Util.toWebuntisDate(new Date()));
 					List<ListEntry> substituteEntries = new SubstituteParser().parseData(node);
 					List<ListEntry> newsEntries = new NewsParser().parseData(node);
 
